@@ -120,16 +120,62 @@ L’interface permet de configurer plusieurs paramètres :
 * affichage du logo
 
 ---
+## Démonstration (pas à pas)
 
-# Démonstration
+Cette démonstration montre comment utiliser **TapJacker** pour illustrer une attaque de type **Tapjacking** dans un environnement de test.
 
-## Interface principale
+### 1) Autoriser l’affichage par-dessus les autres applications (Overlay)
 
-![Main Activity](misc/main_activity.png)
+1. Ouvre les paramètres Android : **Display over other apps**  
+2. Trouve **TapJacker** dans la liste  
+3. Active **Allow display over other apps**
 
-## Exemple d'attaque Tapjacking
+![Liste des apps autorisées à superposer](misc/permission_list.png)
+![Activation de l’overlay pour TapJacker](misc/permission_enable.png)
 
-![Tapjacking Demo](misc/tapjacking_demo.png)
+> Sans cette permission (`SYSTEM_ALERT_WINDOW`), TapJacker ne peut pas afficher l’overlay.
+
+---
+
+### 2) Choisir la cible
+
+1. Ouvre **TapJacker**
+2. Dans **Choose application package**, sélectionne l’application cible (ou utilise la barre de recherche)
+
+Dans cet exemple, la cible est une application volontairement vulnérable utilisée pour l’apprentissage du pentest Android :
+
+- **Hextree Frida Target** : `io.hextree.fridatarget`
+
+---
+
+### 3) Configurer l’attaque
+
+Dans TapJacker :
+
+- **Exported activity** : sélectionner / renseigner l’activité cible  
+- **Overlay color** : choisir une couleur  
+- **Delay (seconds)** : définir le délai (ex. `10`)  
+- **Custom text to show** : mettre un texte (optionnel)  
+- **Show logo** : afficher / masquer le logo
+
+![Configuration TapJacker](misc/main_activity.png)
+
+---
+
+### 4) Lancer la démonstration
+
+1. Clique sur **RUN**
+2. TapJacker affiche un overlay et lance l’activité cible
+3. L’overlay masque l’interface réelle de l’application cible pendant la durée du délai
+
+![Résultat Tapjacking](misc/tapjacking_demo.png)
+
+---
+
+## Notes
+
+- Le bouton **SCAN EXPORTED ACTIVITIES** liste les activités `exported=true` des applications installées pour faciliter la sélection d’une cible.
+- Cette démonstration est réalisée à des fins **éducatives** et de **pentest autorisé**.
 
 ---
 
