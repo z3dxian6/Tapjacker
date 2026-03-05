@@ -283,5 +283,5 @@ Toute utilisation contre un système sans autorisation explicite peut être ill�
 
 # Auteur
 
-**Zoran Tauvry**
+**Zoran**
 Mobile Security • Pentesting
