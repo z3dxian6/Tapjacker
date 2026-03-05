@@ -1,205 +1,206 @@
-TapJacker
+# TapJacker
 
-TapJacker est une application Android développée à des fins de recherche en sécurité mobile et de tests d'intrusion.
-Elle permet de démontrer et d'exploiter des scénarios de Tapjacking en utilisant un overlay interactif au-dessus d'une application cible.
+TapJacker est une application Android conçue pour **démontrer et tester les vulnérabilités de type Tapjacking** dans les applications mobiles.
 
-Le projet permet d'illustrer comment une application malveillante peut manipuler l'interface utilisateur afin de tromper un utilisateur et provoquer des interactions involontaires.
+Le projet a été développé dans un objectif de **recherche en sécurité mobile, d’apprentissage et de tests d’intrusion autorisés**.
 
-⚠️ Cet outil est destiné uniquement à des fins éducatives et de pentest autorisé.
+⚠️ Cet outil doit être utilisé **uniquement dans un cadre légal et autorisé**.
 
-Qu'est-ce que le Tapjacking ?
+---
 
-Le Tapjacking est une attaque de type UI redressing où une application malveillante superpose une interface transparente ou trompeuse au-dessus d'une autre application.
+# Qu'est-ce que le Tapjacking ?
 
-L'utilisateur pense cliquer sur un élément légitime alors qu'il interagit en réalité avec une action cachée dans l'application cible.
+Le **Tapjacking** est une attaque de type **UI redressing** où une application malveillante affiche un **overlay** au-dessus d'une autre application afin de tromper l'utilisateur.
 
-Cette technique peut être utilisée pour :
+L’utilisateur croit cliquer sur un élément visible alors qu’il interagit en réalité avec une action située **dans l’application en arrière-plan**.
 
-activer des permissions
+Cette attaque peut permettre par exemple :
 
-lancer des activités sensibles
+* d’activer des permissions sensibles
+* de lancer des activités internes d’une application
+* de modifier des paramètres
+* de déclencher des actions à l’insu de l’utilisateur
 
-modifier des paramètres
+TapJacker permet de **simuler ce type d’attaque dans un environnement de test**.
 
-installer des applications
+---
 
-déclencher des actions dans une autre application
+# Fonctionnalités
 
-TapJacker permet de simuler ce type d'attaque dans un environnement contrôlé.
+* affichage d’un **overlay Android personnalisable**
+* sélection d’une **application cible**
+* sélection d’une **activité exportée**
+* scan automatique des **exported activities**
+* recherche dans les packages installés
+* personnalisation de l’overlay
 
-Fonctionnalités
+  * couleur
+  * texte
+  * logo
+* délai configurable avant l’attaque
+* démonstration visuelle du Tapjacking
 
-affichage d'un overlay Android personnalisable
+---
 
-sélection d'une application cible
+# Fonctionnement technique
 
-sélection d'une activité exportée
+## 1. Récupération des applications installées
 
-scan automatique des exported activities
+L’application utilise `PackageManager` pour récupérer toutes les applications installées sur l’appareil afin de permettre à l’utilisateur de sélectionner une cible.
 
-recherche dans les packages installés
+---
 
-personnalisation de l'overlay :
+## 2. Scan des activités exportées
 
-couleur
+TapJacker peut analyser les applications installées et identifier les **activités exportées** accessibles par d’autres applications.
 
-texte affiché
+Ces activités sont des **points d’entrée potentiels** exploitables.
 
-logo optionnel
+---
 
-temporisation configurable avant l'exécution
+## 3. Création de l’overlay
 
-démonstration visuelle de l'attaque
+L’application utilise le `WindowManager` Android pour afficher un overlay couvrant l’écran :
 
-Fonctionnement technique
+```java
+WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
+```
 
-L'application fonctionne en plusieurs étapes.
+L’overlay est configuré pour :
 
-1. Récupération des applications installées
+* couvrir l’écran
+* rester visible au-dessus des autres applications
+* masquer les interactions réelles
 
-TapJacker récupère toutes les applications installées via le PackageManager afin de permettre à l'utilisateur de sélectionner une cible.
+---
 
-Cette liste est utilisée pour alimenter le menu déroulant.
+## 4. Permissions Android utilisées
 
-MainActivity
+L’application nécessite les permissions suivantes :
 
-2. Scan des activités exportées
+```xml
+<uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
+```
 
-L'application peut analyser toutes les applications installées et identifier les activités exportées accessibles par d'autres applications.
+Permet d’afficher un overlay au-dessus des autres applications.
 
-Ces activités peuvent ensuite être ciblées par l'attaque.
+```xml
+<uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"/>
+```
 
-MainActivity
+Permet de lister les applications installées.
 
-3. Création d'un overlay
+---
 
-Une vue overlay est injectée dans le système à l'aide du WindowManager.
+## 5. Lancement de l’activité cible
 
-L'overlay est configuré pour :
+Une fois l’overlay affiché, l’application lance l’activité cible avec un `Intent` :
 
-couvrir tout l'écran
+```java
+Intent intent = new Intent();
+intent.setComponent(new ComponentName(packageName, activityName));
+intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+startActivity(intent);
+```
 
-rester visible
+Cela permet de déclencher une action dans l’application cible pendant que l’utilisateur voit uniquement l’overlay.
 
-empêcher l'utilisateur de comprendre l'interaction réelle
+---
 
-tapjacker_overlay
+# Interface utilisateur
 
-Le système utilise le type :
+L’interface permet de configurer plusieurs paramètres :
 
-TYPE_APPLICATION_OVERLAY
+* recherche d’application
+* sélection du package cible
+* sélection d’une activité exportée
+* choix de la couleur de l’overlay
+* délai avant exécution
+* texte personnalisé
+* affichage du logo
 
-afin d'afficher l'overlay au-dessus des autres applications.
+---
 
-4. Permission système
+# Démonstration
 
-L'application nécessite la permission suivante :
+## Interface principale
 
-SYSTEM_ALERT_WINDOW
+![Main Activity](misc/main_activity.png)
 
-afin de pouvoir afficher un overlay au-dessus des autres applications.
+## Exemple d'attaque Tapjacking
 
-AndroidManifest
+![Tapjacking Demo](misc/tapjacking_demo.png)
 
-Elle utilise également :
+---
 
-QUERY_ALL_PACKAGES
+# Installation
 
-pour lister les applications installées.
+## Cloner le projet
 
-5. Lancement de l'activité cible
-
-Une fois l'overlay affiché, TapJacker lance l'activité cible via un Intent.
-
-Cela permet de déclencher une interaction dans l'application cible pendant que l'utilisateur voit uniquement l'overlay.
-
-MainActivity
-
-Interface utilisateur
-
-L'interface permet de configurer plusieurs paramètres avant de lancer l'attaque.
-
-Options disponibles :
-
-recherche d'application
-
-sélection du package cible
-
-sélection de l'activité exportée
-
-choix de la couleur de l'overlay
-
-délai avant exécution
-
-texte personnalisé
-
-affichage d'un logo
-
-activity_main
-
-Démonstration
-Interface principale
-
-Exemple d'overlay tapjacking
-
-Installation
-Cloner le projet
+```bash
 git clone https://github.com/z3dxian6/Tapjacker.git
-Ouvrir dans Android Studio
+```
 
-ouvrir Android Studio
+---
 
-sélectionner Open Project
+## Ouvrir avec Android Studio
 
-choisir le dossier TapJacker
+1. ouvrir Android Studio
+2. sélectionner **Open Project**
+3. choisir le dossier `TapJacker`
+4. construire le projet
 
-construire le projet
+---
 
-Installer l'application
+## Installer l’application
 
-Compiler l'application puis installer l'APK sur un appareil Android ou un émulateur.
+Compiler le projet et installer l’APK sur un appareil Android ou un émulateur.
 
-Utilisation
+---
 
-lancer l'application TapJacker
+# Utilisation
 
-sélectionner une application cible
-
-sélectionner une activité exportée
-
-configurer l'overlay
-
-définir un délai
-
-lancer la démonstration
+1. lancer l’application **TapJacker**
+2. sélectionner une application cible
+3. sélectionner une activité exportée
+4. configurer l’overlay
+5. définir un délai
+6. lancer la démonstration
 
 Une fois exécuté :
 
-l'overlay est affiché
+* l’overlay est affiché
+* l’activité cible est lancée
+* l’utilisateur voit uniquement l’overlay
 
-l'activité cible est lancée
+---
 
-l'utilisateur voit uniquement l'overlay
+# Contre-mesures contre le Tapjacking
 
-Contre-mesures
+Les développeurs Android peuvent se protéger contre cette attaque en utilisant :
 
-Les développeurs peuvent se protéger contre le Tapjacking en utilisant :
+```java
+setFilterTouchesWhenObscured(true);
+```
 
-setFilterTouchesWhenObscured(true)
+ou en vérifiant si une vue est obscurcie :
 
-ou en vérifiant l'état de la fenêtre :
-
+```java
 View.isObscured()
+```
 
 Autres protections possibles :
 
-désactiver les activités exportées non nécessaires
+* éviter les activités exportées inutiles
+* vérifier l’origine des intents
+* utiliser `FLAG_SECURE`
+* détecter les overlays
 
-vérifier l'origine des intents
+---
 
-utiliser FLAG_SECURE
+# Structure du projet
 
-Structure du projet
+```
 TapJacker
 │
 ├── app
@@ -218,19 +219,23 @@ TapJacker
 │
 ├── README.md
 └── LICENSE
-Avertissement légal
+```
 
-Ce projet est fourni uniquement pour :
+---
 
-la recherche en cybersécurité
+# Avertissement légal
 
-l'apprentissage de la sécurité Android
+Ce projet est destiné uniquement à :
 
-les tests d'intrusion autorisés
+* la recherche en sécurité
+* l’apprentissage de la sécurité Android
+* les tests d’intrusion autorisés
 
-Toute utilisation de cet outil contre un système sans autorisation explicite peut être illégale.
+Toute utilisation contre un système sans autorisation explicite peut être illégale.
 
-Auteur
+---
 
-Projet développé par Zoran Tauvry
-Pentesting / Mobile Security Research
+# Auteur
+
+**Zoran Tauvry**
+Mobile Security • Pentesting
