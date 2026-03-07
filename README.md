@@ -204,23 +204,6 @@ Compiler le projet et installer l’APK sur un appareil Android ou un émulateur
 
 ---
 
-# Utilisation
-
-1. lancer l’application **TapJacker**
-2. sélectionner une application cible
-3. sélectionner une activité exportée
-4. configurer l’overlay
-5. définir un délai
-6. lancer la démonstration
-
-Une fois exécuté :
-
-* l’overlay est affiché
-* l’activité cible est lancée
-* l’utilisateur voit uniquement l’overlay
-
----
-
 # Contre-mesures contre le Tapjacking
 
 Les développeurs Android peuvent se protéger contre cette attaque en utilisant :
